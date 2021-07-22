@@ -142,5 +142,5 @@ function updateTimer() {
         ms = `0${ms}`;
     }
     if (seconds < 10) seconds = `0${seconds}`;
-    document.querySelector('.timer').innerText = `${seconds}.${ms}`
+    document.querySelector('.timer span').innerText = `${seconds}.${ms}`
 }
