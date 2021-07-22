@@ -1,36 +1,40 @@
 'use strict'
-var firstCellClicked;
-var gGame;
+var gLevel = {
+    size: 4,
+    mines: 2
+};
+var gGame = {
+    isOn: false,
+    shownCount: 0,
+    markedCount: 0,
+    secsPassed: 0
+};
 var gBoard;
-var gLives;
-var gGameIntervalId;
 var elTimer = document.querySelector('.timer');
-var elLives = document.querySelector('.lives')
-var elModal = document.querySelector('.modal')
-var elVictory = document.querySelector('h2');
+var gTimesClicked;
+var gGameIntervalId;
+var elRestart = document.querySelector('.restart')
 
 
 
 function init() {
-    gGame = {
-        isOn: false,
-        shownCount: 0,
-        markedCount: 0,
-        secsPassed: 0
-    }
-    clearInterval(gGameIntervalId);
+    gGame.isOn = true;
+    gTimesClicked = 0;
+    gGame.markedCount = 0;
+    gGame.shownCount = 0;
     gStartTime = Date.now();
+    clearInterval(gGameIntervalId);
+    gBoard = buildBoard(gLevel.size)
+    console.table(gBoard)
+    elRestart.innerText = HAPPY;
+    placeMines()
     elTimer.innerText = '00.000'
-    elModal.style.display = 'none';
-    firstCellClicked = 0;
-    elVictory.style.display = 'none';
-
-    gLives = 3;
-    elLives.innerText = `lives:${gLives}`
-    gBoard = buildBoard(gLevel.size);
-
+    setMinesNegsCount(gBoard)
     renderBoard(gBoard, '.board')
 }
+
+
+
 
 function chooseBoardSize(elButton) {
     gLevel.size = elButton.getAttribute('data-inside');
@@ -39,83 +43,87 @@ function chooseBoardSize(elButton) {
     init();
 }
 
-
-
-
-
-function placeMines() {
-    var mines = gLevel.mines
-    for (var i = 0; i < mines; i++) {
-        var randomI = getRandomInt(0, gLevel.size)
-        var randomJ = getRandomInt(0, gLevel.size)
-        if (gBoard[randomI][randomJ].isMine) i--
-        gBoard[randomI][randomJ].isMine = true
-    }
-
-}
-
-
-
-
-
-
 function cellClicked(elCell, cellI, cellJ) {
-    firstCellClicked++
-    if (firstCellClicked === 1) {
+    gTimesClicked++
+    if (gTimesClicked === 1) {
         gGameIntervalId = setInterval(updateTimer, 16);
     }
-    console.log({ i: cellI, j: cellJ })
-    var negCount = setMineNegCount(cellI, cellJ, gBoard);
-    console.log('neg mines are ', negCount)
-    console.log(gBoard[cellI][cellJ])
-    if (gBoard[cellI][cellJ] !== MINE) {
-        gBoard[cellI][cellJ].isShown = true
-    }
-    if (gBoard[cellI][cellJ] === MINE) {
-        gLives--
-        elLives.innerText = `lives:${gLives}`
-    }
-    if (gLives === 0) {
-        elVictory.innerText = 'YOU EXPLODED';
+    if (!gGame.isOn) return
+    gBoard[cellI][cellJ].isShown = true;
+    gGame.shownCount++
+    if (gBoard[cellI][cellJ].isMine) {
+        renderCell({ i: cellI, j: cellJ }, MINE)
         gameOver();
-    }
-    if (gLevel.size === 4) {
-        if (firstCellClicked > 14) {
-            elVictory.innerText = 'YOU SURVIVED';
-            gameOver();
+        for (var i = 0; i < gBoard.length; i++) {
+            for (var j = 0; j < gBoard[0].length; j++) {
+                if (gBoard[i][j].isMine) {
+                    gBoard[i][j].isShown = true;
+                    renderBoard(gBoard, '.board')
+                }
+            }
         }
-    } else if (gLevel.size === 8) {
-        if (firstCellClicked > 52) {
-            elVictory.innerText = 'YOU SURVIVED';
-            gameOver();
+    } else {
+        if (gBoard[cellI][cellJ].minesAroundCount === 0) {
+            expandShown(gBoard, elCell, cellI, cellJ);
         }
-    } else if (gLevel.size === 12) {
-        if (firstCellClicked > 114) {
-            elVictory.innerText = 'YOU SURVIVED';
-            gameOver();
-        }
+        renderCell({ i: cellI, j: cellJ }, gBoard[cellI][cellJ].minesAroundCount)
+
     }
-
-    console.log(gBoard[cellI][cellJ])
-    renderBoard(gBoard, '.board')
-
-
-}
-function markCell(elCell,cellI,cellJ,event){
-    if(gBoard[cellI][cellJ]===''){
-        event.preventDefault();
-        gBoard[cellI][cellJ]=FLAG;
-    }
-    renderBoard(gBoard,'.board')
-    console.table(gBoard)
+    console.log('shown count', gGame.shownCount)
+    checkVictory()
 }
 
 
+
+function markCell(elCell, cellI, cellJ, ev) {
+
+    gTimesClicked++
+    if (gTimesClicked === 1) {
+        gGameIntervalId = setInterval(updateTimer, 16);
+    }
+    if (!gGame.isOn) return
+    ev.preventDefault();
+    if (gBoard[cellI][cellJ].isShown) return
+    if (gBoard[cellI][cellJ].isMarked) {
+        gBoard[cellI][cellJ].isMarked = false
+        renderCell({ i: cellI, j: cellJ }, '')
+        gGame.markedCount--;
+    } else {
+        gBoard[cellI][cellJ].isMarked = true
+        renderCell({ i: cellI, j: cellJ }, FLAG)
+        gGame.markedCount = gGame.markedCount + 2;
+
+    }
+    console.log('marked count', gGame.markedCount)
+    checkVictory()
+}
+
+
+function expandShown(board, elCell, cellI, cellJ) {
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= board.length) continue;
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= board[cellI].length) continue;
+            if (i === cellI && j === cellJ) continue;
+            if (board[i][j].isMarked) continue;
+            renderCell({ i: i, j: j }, board[i][j].minesAroundCount);
+        }
+    }
+}
 
 
 function gameOver() {
-    console.log('game over')
-    clearInterval(gGameIntervalId);
-    elModal.style.display = 'inline-block'
-    elVictory.style.display = 'block';
+
+    gGame.isOn = false;
+    clearInterval(gGameIntervalId)
+    elRestart.innerText = DEAD + ' You lost..'
+}
+
+
+function checkVictory() {
+    if (gGame.markedCount + gGame.shownCount === gLevel.size * gLevel.size) {
+        elRestart.innerText = KING + ' you Won!';
+        gGame.isOn = false;
+        clearInterval(gGameIntervalId)
+    }
 }

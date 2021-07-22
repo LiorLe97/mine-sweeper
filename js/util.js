@@ -3,25 +3,7 @@ const MINE = '🧨';
 const FLAG = '🚩';
 const HAPPY = '😃'
 const DEAD = '🤧'
-var gLevel = {
-    size: 4,
-    mines: 2
-};
-
-
-
-var gNums=[]
-if(gLevel.mines === 2) {
-    gNums = [0, 1, 2, 3];
-} else if (gLevel.mines === 12) {
-    gNums = [0, 1, 2, 3, 4, 5, 6, 7]
-} else if (gLevel.mines === 30) {
-    gNums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-}
-
-
-
-
+const KING = '🤴'
 
 
 
@@ -32,16 +14,15 @@ function renderBoard(board, selector) {
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>';
         for (var j = 0; j < board[0].length; j++) {
+
             if (!board[i][j].isShown) {
-                cell = '';
+                cell = ''
             } else {
-                if (board[i][j] === MINE) {
-                    cell = MINE;
-                } else {
-                    cell = setMineNegCount(i, j, board);
-                }
+                cell = (board[i][j].isMine) ? MINE : board[i][j].minesAroundCount
             }
-            var className = 'cell cell' + '-' + i + '-' + j;
+
+
+            var className = 'cell cell' + i + '-' + j;
             strHTML += `<td class="' ${className} '" onclick=cellClicked(this,${i},${j}) oncontextmenu=markCell(this,${i},${j},event)>${cell}</td>`
         }
         strHTML += '</tr>'
@@ -52,27 +33,42 @@ function renderBoard(board, selector) {
 }
 
 
+function placeMines() {
+    var mines = gLevel.mines
+    for (var i = 0; i < mines; i++) {
+        var randomI = getRandomInt(0, gLevel.size)
+        var randomJ = getRandomInt(0, gLevel.size)
+        if (gBoard[randomI][randomJ].isMine) i--
+            gBoard[randomI][randomJ].isMine = true
+    }
+
+}
+
 //create matrix by size
 function buildBoard(SIZE) {
     var board = [];
     for (var i = 0; i < SIZE; i++) {
         board.push([]);
         for (var j = 0; j < SIZE; j++) {
-            board[i][j] = {
-                minesAroundCount: setMineNegCount(i, j, board),
-                isShown: false,
-                isMine: false,
-                isMarked: true
-            }
+            board[i][j] = createCell()
 
         }
     }
-    for (var i = 0; i <= gLevel.mines; i++) {
-        board[drawNum()][drawNum()] = MINE
-    }
+
     return board;
 }
 
+
+function createCell() {
+    var cell = {
+        minesAroundCount: 0,
+        isShown: false,
+        isMine: false,
+        isMarked: true
+    }
+    return cell
+
+}
 
 // location such as: {i: 2, j: 7}
 function renderCell(location, value) {
@@ -106,35 +102,35 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-//get random color
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+
+function setMinesNegsCount(gBoard) {
+    for (var i = 0; i < gLevel.size; i++) {
+        for (var j = 0; j < gLevel.size; j++) {
+            var negsCount = countNeighbors(i, j, gBoard)
+            gBoard[i][j].minesAroundCount = negsCount
+        }
     }
-    return color;
 }
 
-
 //neighbor counter
-function setMineNegCount(cellI, cellJ, gBoard) {
+function countNeighbors(cellI, cellJ, gBoard) {
     var neighborsCount = 0;
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue;
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (j < 0 || j >= gBoard[i].length) continue;
             if (i === cellI && j === cellJ) continue;
-            if (gBoard[i][j] === MINE) neighborsCount++;
+            if (gBoard[i][j].isMine) neighborsCount++
 
         }
     }
-    return neighborsCount;
+    return neighborsCount
 }
 
 
 // timer
 var gStartTime = Date.now();
+
 function updateTimer() {
     var timeDiff = Date.now() - gStartTime;
     var seconds = parseInt(timeDiff / 1000);
@@ -148,14 +144,3 @@ function updateTimer() {
     if (seconds < 10) seconds = `0${seconds}`;
     document.querySelector('.timer').innerText = `${seconds}.${ms}`
 }
-
-
-
-
-function drawNum() {
-    var idx = getRandomInt(0, gNums.length)
-    var num = gNums[idx]
-    return num
-}
-
-

@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=, initial-scale=1.0">
     <title>MINE SWEEPER</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
+
 <body onload="init()">
     <h1>MINE SWEEPER</h1>
     <h2></h2>
-    <input type="radio" data-inside="4" id="easy" onclick="chooseBoardSize(this)"  value="1">
-         <label for="easy">easy (4x4)</label>
-         <input type="radio" data-inside="8" id="hard" onclick="chooseBoardSize(this)" value="12">
-         <label for="hard">hard (8x8)</label>
-         <input type="radio" data-inside="12" id="extreme" onclick="chooseBoardSize(this)" value="30">
-         <label for="extreme">extreme (12x12)</label>
+    <input type="radio" data-inside="4" id="easy" onclick="chooseBoardSize(this)" value="1">
+    <label for="easy">easy (4x4)</label>
+    <input type="radio" data-inside="8" id="hard" onclick="chooseBoardSize(this)" value="12">
+    <label for="hard">hard (8x8)</label>
+    <input type="radio" data-inside="12" id="extreme" onclick="chooseBoardSize(this)" value="30">
+    <label for="extreme">extreme (12x12)</label>
     <div class="timer">00.000</div>
     <div class="lives"></div>
     <table border="1" cellpadding="5">
         <tbody class="board"></tbody>
     </table>
-    <div class="modal">
-        <button onclick="init()"><b>Play Again ?</b></button>
-    </div>
-    <script src="js/util.js"></script>
+    <div class="restart" onclick="init()"></div>
     <script src="js/main.js"></script>
+    <script src="js/util.js"></script>
 </body>
+
 </html>

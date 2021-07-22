@@ -1,83 +1,47 @@
-h1{
-    font-family: Arial, Helvetica, sans-serif; 
-    color:rgb(48, 48, 236)
-    
-}
-body{
-    background-color: rgb(143, 125, 240);
+h1 {
+    color: aqua;
     text-align: center;
 }
-table{
-    margin:auto;
-    table-layout:fixed;
-    width:300px;
-    height:300px;
-    background-color: rgb(183, 155, 236);
-    
-}
-.timer{
-    border:rgb(127, 193, 255) 5px solid;
-    margin:auto;
-    margin-bottom:10px;
-    width:100px;
-    text-align:center
-}
 
-tr,td{
- width: 50px;
- height: 50px;
- background-color: rgb(183, 155, 236);
- border-radius:10%;
- transition-duration:0.5s ;
-}
-
-tr,td:hover{
-    
-    background-color: cornflowerblue;
-}
-input{
- margin-bottom:20px;
-}
-button{
-    transition-duration: 1s;
-    height: 30px;
-    
-}
-button:hover{
-    background-color: rgb(250, 76, 105);
-
-
-}
-
-h2{
-    font-family: Arial, Helvetica, sans-serif; 
-    color:coral; 
-}
-
-.modal{
-    border:rgb(127, 193, 255) 5px solid;
-    background-color:pink;
-    width: 100px;
-    height: 30px;
-    padding:5px;
+body {
+    background-color: black;
     text-align: center;
-    margin:auto;
-    display:none;
-    border-radius:5%;
-    transition-duration: 1s;
-}
-.modal:hover{
-    background-color: rgb(250, 76, 105);
-    width:110px;
 }
 
+.timer {
+    text-align: center;
+    margin: auto;
+    color: aqua;
+}
 
-.lives{
-    border:rgb(127, 193, 255) 5px solid;
-    margin:auto;
-    margin-bottom:10px;
-    display:inline-block;
-    width: 100px;
-    color:red;
-    
+label {
+    color: aqua;
+    text-align: center;
+    margin: auto;
+}
+
+table {
+    margin: auto;
+    table-layout: fixed;
+    width: 300px;
+    height: 300px;
+    background-color: rgb(113, 205, 241);
+}
+
+tr,
+td {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(42, 46, 240);
+    border-radius: 10%;
+    transition-duration: 0.5s;
+}
+
+.restart {
+    margin-top: 10px;
+    color: aqua;
+}
+
+.restart:hover {
+    cursor: pointer;
 }
